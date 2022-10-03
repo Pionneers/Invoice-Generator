@@ -39,6 +39,8 @@ dependencies:
   printing: ^5.9.3                                  # to share data in the form of pdf
   open_file: ^3.2.1                                 # calls native APP to open files 
   path_provider: ^2.0.11                            # provides path of phone internal directory
+  font_awesome_flutter: ^10.2.1                     # icon library
+  timelines: ^0.1.0                                 # for timelime UI
 
 dev_dependencies:
   flutter_test:
