@@ -23,6 +23,8 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
   // Observable Variables
   RxInt listLength = 0.obs;
   RxInt processIndex = 0.obs;
+  RxInt totalQuantity = 0.obs;
+  RxDouble totalAmount = 0.00.obs;
   RxInt selectedPageIndex = 0.obs;
 
   // Controllers
@@ -33,7 +35,8 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
   late TextEditingController customerAddCtrl;
   late TextEditingController customerNameCtrl;
   late TextEditingController paymentTermsCtrl;
-  List<List<TextEditingController>> controllers = List.generate(30, (index) => []);
+  late TextEditingController balPaymentCtrl;
+  List<List<TextEditingController>> controllers = [];
 
   // Page Controller
   late PageController pageController;
@@ -43,6 +46,7 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
 
   // Form Keys
   final pdfFormKey = GlobalKey<FormState>();
+  final balPaymentFormKey = GlobalKey<FormState>();
 
 
   @override
@@ -61,6 +65,7 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
     customerAddCtrl.dispose();
     customerNameCtrl.dispose();
     paymentTermsCtrl.dispose();
+    balPaymentCtrl.dispose();
     // controllers.forEach((element) => element.dispose());
     super.onClose();
   }
@@ -76,6 +81,7 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
       customerAddCtrl = TextEditingController();
       customerNameCtrl = TextEditingController();
       paymentTermsCtrl = TextEditingController();
+      balPaymentCtrl = TextEditingController();
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -97,9 +103,21 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
     if (selectedPageIndex.value == 1) {
       processIndex.value = (processIndex.value - 1) % processes.length;
       pageController.previousPage(duration: 200.milliseconds, curve: Curves.ease);
+      // for (int i = 0; i < controllers.length; i++) {
+      //   controllers[i][0].clear();
+      //   controllers[i][1].clear();
+      //   controllers[i][2].clear();
+      // }
+      pdfFormKey.currentState!.reset();
+      controllers.clear();
+      print('Back: $controllers');
+      print('Length: ${controllers.length}');
     }
     else if (selectedPageIndex.value == 2) {
-      
+      totalAmount.value = 0.00;
+      totalQuantity.value = 0;
+      processIndex.value = (processIndex.value - 1) % processes.length;
+      pageController.previousPage(duration: 200.milliseconds, curve: Curves.ease);
     }
     else if (isLastPage) {
       
@@ -112,11 +130,16 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
     // Customer info page
     if (selectedPageIndex.value == 0){
       if (invoiceNoCtrl.text != '' && customerNameCtrl.text != '' && customerAddCtrl.text != '' && noOfProductsCtrl.text != '') {
-        listLength.value = int.parse(noOfProductsCtrl.text);
+        listLength.value = int.parse(noOfProductsCtrl.value.text);
         for (int i = 0; i < listLength.value; i++) {
-          for (int j = 0; j < 3; j++) {
-            controllers[i].add(TextEditingController());
+          print(controllers);
+          controllers.add([]);
+          if (controllers[i].isEmpty) {
+            for (int j = 0; j < 3; j++) {
+              controllers[i].add(TextEditingController());
+            }
           }
+          print(controllers);
         }
         processIndex.value = (processIndex.value + 1) % processes.length;
         pageController.nextPage(duration: 200.milliseconds, curve: Curves.ease);
@@ -128,6 +151,22 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
     // Products page
     else if(selectedPageIndex.value == 1){
       if(pdfFormKey.currentState!.validate()){
+        for (int i = 0; i < controllers.length; i++) {
+          if (controllers[i].isNotEmpty) {
+            if (!controllers[i][1].value.text.toString().contains('.')) {
+              double unitPrice = int.parse(controllers[i][1].value.text).toDouble();
+              int quantity = int.parse(controllers[i][2].value.text);
+              totalAmount.value += (unitPrice * quantity);
+              totalQuantity.value += quantity;
+            }
+            else {
+              double unitPrice = double.parse(controllers[i][1].value.text);
+              int quantity = int.parse(controllers[i][2].value.text);
+              totalAmount.value += (unitPrice * quantity);
+              totalQuantity.value += quantity;
+            }
+          }
+        }
         processIndex.value = (processIndex.value + 1) % processes.length;
         pageController.nextPage(duration: 200.milliseconds, curve: Curves.ease);
       }

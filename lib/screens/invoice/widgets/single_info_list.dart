@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class SingleInfoListWidget extends StatelessWidget {
   final int index;
@@ -70,6 +71,7 @@ class SingleInfoListWidget extends StatelessWidget {
                       helperText: "Quantity",
                       prefixIcon: Icon(Icons.format_list_numbered_outlined),
                     ),
+                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9]')),],
                     keyboardType: const TextInputType.numberWithOptions(),
                     controller: txtCtrl[2],
                     style: TextStyle(color: Colors.grey[850]),

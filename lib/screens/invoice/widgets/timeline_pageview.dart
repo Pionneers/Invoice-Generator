@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../constants/controllers.dart';
 import 'customer_info.dart';
+import 'payment_info.dart';
 import 'products_info.dart';
-
 
 class TimelinePageViewWidget extends StatelessWidget {
   const TimelinePageViewWidget({
@@ -22,6 +22,7 @@ class TimelinePageViewWidget extends StatelessWidget {
           final widgets = <Widget>[
             const CustomerInfo(),
             const ProductsInfo(),
+            const PaymentInfo(),
           ];
           return widgets[index];
         }
