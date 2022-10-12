@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
@@ -8,6 +10,8 @@ import 'package:get/instance_manager.dart';
 import 'package:intl/intl.dart';
 
 import '../constants/timeline.dart';
+import '../services/convert_to_pdf.dart';
+import '../services/pdf_api.dart';
 
 class InvoiceController extends GetxController with GetSingleTickerProviderStateMixin{
   static InvoiceController instance = Get.find();
@@ -19,8 +23,8 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
     'Payment',
     'Summary',
   ];
-  RxBool paymentTypeFull = true.obs;
   bool get isLastPage => selectedPageIndex.value == processes.length - 1;
+  Map<String, Map<String, num>> products = {};
 
   // Observable Variables
   RxInt listLength = 0.obs;
@@ -28,14 +32,15 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
   RxInt totalQuantity = 0.obs;
   RxDouble totalAmount = 0.00.obs;
   RxInt selectedPageIndex = 0.obs;
+  RxBool paymentTypeFull = true.obs;
 
   // Controllers
-  late TextEditingController dueDateCtrl;
-  late TextEditingController noOfProductsCtrl;
   late TextEditingController invoiceNoCtrl;
   late TextEditingController invoiceDateCtrl;
-  late TextEditingController customerAddCtrl;
   late TextEditingController customerNameCtrl;
+  late TextEditingController customerAddCtrl;
+  late TextEditingController noOfProductsCtrl;
+  late TextEditingController dueDateCtrl;
   late TextEditingController paymentTermsCtrl;
   late TextEditingController balPaymentCtrl;
   List<List<TextEditingController>> controllers = [];
@@ -72,6 +77,7 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
     super.onClose();
   }
 
+  // Initializes all controllers
   void initializeVariables(){
     try {
       pageController = PageController();
@@ -100,6 +106,7 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
     }
   }
 
+  // Opens Cupertino Date Picker
   void showIOSDatePicker(bool invoiceDate) {
     invoiceDate ? invoiceDateCtrl.text = DateFormat('yyyy-MM-dd').format(DateTime.now()) : dueDateCtrl.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
     showCupertinoModalPopup(
@@ -124,6 +131,23 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
         ),
       )
     );
+  }
+
+  // Generates PDF
+  Future generatePDF() async {
+    final pdfFile = await PdfInvoiceApi.generate(
+      invoiceNo: invoiceNoCtrl.text,
+      invoiceDate: invoiceDateCtrl.text,
+      cusName: customerNameCtrl.text,
+      cusAddress: customerAddCtrl.text,
+      totalAmount: totalAmount.value,
+      pendingPayment: paymentTypeFull.value ? double.parse(balPaymentCtrl.text) : 0.00,
+      isPending: paymentTypeFull.value,
+      dueDate: dueDateCtrl.text,
+      paymentTerms: paymentTermsCtrl.text,
+      products: products,
+    );
+    PdfApi.openFile(pdfFile);
   }
 
   // Function to handle previous page view navigations
@@ -204,17 +228,33 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
     }
 
     // Invoice summary page
-    else if (isLastPage){
-      // invoiceDateCtrl.text = DateFormat('dd-MM-yyyy').format(DateTime.parse(invoiceDateCtrl.text));
-      // dueDateCtrl.text = DateFormat('dd-MM-yyyy').format(DateTime.parse(dueDateCtrl.text));
-      // final pdfFile = await TransferPdfInvoiceApi.generate(
-      //   log,
-      //   customerAddCtrl.text.toUpperCase(),
-      //   invoiceNoCtrl.text,
-      //   paymentTermsCtrl.text,
-      //   dueDateCtrl.text,
-      // );
-      // PdfApi.openFile(pdfFile);
+    else if (isLastPage) {
+      if (DateTime.tryParse(invoiceDateCtrl.text) == null) {
+        controllers.toList().forEach((element) {
+          products.putIfAbsent(
+            element.toList()[0].text, 
+            () => {
+              "UnitPrice": double.parse(element.toList()[1].text), 
+              "Quantity": int.parse(element.toList()[2].text),
+            }
+          );
+        },);
+        generatePDF();
+      }
+      else {
+        invoiceDateCtrl.text = DateFormat('dd-MM-yyyy').format(DateTime.parse(invoiceDateCtrl.text));
+        dueDateCtrl.text = DateFormat('dd-MM-yyyy').format(DateTime.parse(dueDateCtrl.text));
+        controllers.toList().forEach((element) {
+          products.putIfAbsent(
+            element.toList()[0].text, 
+            () => {
+              "UnitPrice": double.parse(element.toList()[1].text), 
+              "Quantity": int.parse(element.toList()[2].text),
+            }
+          );
+        },);
+        generatePDF();
+      }
     }
   }
 
