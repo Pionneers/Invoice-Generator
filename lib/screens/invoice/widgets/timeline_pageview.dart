@@ -4,6 +4,7 @@ import '../../../constants/controllers.dart';
 import 'customer_info.dart';
 import 'payment_info.dart';
 import 'products_info.dart';
+import 'summary_info.dart';
 
 class TimelinePageViewWidget extends StatelessWidget {
   const TimelinePageViewWidget({
@@ -23,6 +24,7 @@ class TimelinePageViewWidget extends StatelessWidget {
             const CustomerInfo(),
             const ProductsInfo(),
             const PaymentInfo(),
+            const SummaryInfo(),
           ];
           return widgets[index];
         }

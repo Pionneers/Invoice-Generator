@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:get/get_utils/get_utils.dart';
 import 'package:get/instance_manager.dart';
+import 'package:intl/intl.dart';
 
 import '../constants/timeline.dart';
 
@@ -98,20 +100,39 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
     }
   }
 
+  void showIOSDatePicker(bool invoiceDate) {
+    invoiceDate ? invoiceDateCtrl.text = DateFormat('yyyy-MM-dd').format(DateTime.now()) : dueDateCtrl.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    showCupertinoModalPopup(
+      context: Get.context!,
+      builder: (_) => Container(
+        height: 190,
+        color: const Color.fromARGB(255, 255, 255, 255),
+        child: Column(
+          children: [
+            SizedBox(
+              height: 180,
+              child: CupertinoDatePicker(
+                dateOrder: DatePickerDateOrder.dmy,
+                mode: CupertinoDatePickerMode.date,
+                initialDateTime: invoiceDate ? DateTime.parse(invoiceDateCtrl.text) : DateTime.parse(dueDateCtrl.text),
+                onDateTimeChanged: (val) {
+                  invoiceDate ? invoiceDateCtrl.text = DateFormat('yyyy-MM-dd').format(val) : dueDateCtrl.text = DateFormat('yyyy-MM-dd').format(val);
+                },
+              ),
+            ),
+          ],
+        ),
+      )
+    );
+  }
+
   // Function to handle previous page view navigations
   previousPage(){
     if (selectedPageIndex.value == 1) {
       processIndex.value = (processIndex.value - 1) % processes.length;
       pageController.previousPage(duration: 200.milliseconds, curve: Curves.ease);
-      // for (int i = 0; i < controllers.length; i++) {
-      //   controllers[i][0].clear();
-      //   controllers[i][1].clear();
-      //   controllers[i][2].clear();
-      // }
       pdfFormKey.currentState!.reset();
       controllers.clear();
-      print('Back: $controllers');
-      print('Length: ${controllers.length}');
     }
     else if (selectedPageIndex.value == 2) {
       totalAmount.value = 0.00;
@@ -120,7 +141,8 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
       pageController.previousPage(duration: 200.milliseconds, curve: Curves.ease);
     }
     else if (isLastPage) {
-      
+      processIndex.value = (processIndex.value - 1) % processes.length;
+      pageController.previousPage(duration: 200.milliseconds, curve: Curves.ease);
     }
   }
 
@@ -132,14 +154,12 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
       if (invoiceNoCtrl.text != '' && customerNameCtrl.text != '' && customerAddCtrl.text != '' && noOfProductsCtrl.text != '') {
         listLength.value = int.parse(noOfProductsCtrl.value.text);
         for (int i = 0; i < listLength.value; i++) {
-          print(controllers);
           controllers.add([]);
           if (controllers[i].isEmpty) {
             for (int j = 0; j < 3; j++) {
               controllers[i].add(TextEditingController());
             }
           }
-          print(controllers);
         }
         processIndex.value = (processIndex.value + 1) % processes.length;
         pageController.nextPage(duration: 200.milliseconds, curve: Curves.ease);
@@ -174,13 +194,28 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
 
     // Payment page
     else if(selectedPageIndex.value == 2){
+      if (!paymentTypeFull.value) {
+        if (!balPaymentCtrl.text.contains('.')) {
+          balPaymentCtrl.text = int.parse(balPaymentCtrl.text).toStringAsFixed(2);
+        }
+      }
+      processIndex.value = (processIndex.value + 1) % processes.length;
+      pageController.nextPage(duration: 200.milliseconds, curve: Curves.ease);
     }
 
     // Invoice summary page
     else if (isLastPage){
+      // invoiceDateCtrl.text = DateFormat('dd-MM-yyyy').format(DateTime.parse(invoiceDateCtrl.text));
+      // dueDateCtrl.text = DateFormat('dd-MM-yyyy').format(DateTime.parse(dueDateCtrl.text));
+      // final pdfFile = await TransferPdfInvoiceApi.generate(
+      //   log,
+      //   customerAddCtrl.text.toUpperCase(),
+      //   invoiceNoCtrl.text,
+      //   paymentTermsCtrl.text,
+      //   dueDateCtrl.text,
+      // );
+      // PdfApi.openFile(pdfFile);
     }
-  
   }
 
-  
 }

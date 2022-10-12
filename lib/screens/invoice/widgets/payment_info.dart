@@ -40,12 +40,25 @@ class PaymentInfo extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 35.0),
-            InvoiceField(
-              hintText: "Due date", 
-              labelText: "Due date", 
-              helperText: "Enter due date",
-              icon: const  Icon(Icons.date_range_rounded),
-              controller: invoiceController.dueDateCtrl,
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: TextFormField(
+                onTap: () => invoiceController.showIOSDatePicker(false),
+                decoration: const InputDecoration(
+                  isDense: true,
+                  hintText: "Due date", 
+                  labelText: "Due date", 
+                  alignLabelWithHint: true,
+                  border: OutlineInputBorder(),
+                  helperText: "Enter due date",
+                  prefixIcon: Icon(Icons.date_range_rounded),
+                ),
+                keyboardType: TextInputType.datetime,
+                controller: invoiceController.dueDateCtrl,
+                style: TextStyle(color: Colors.grey[850]),
+                validator: (value) => value!.isEmpty ? "Enter due date" : null,
+                toolbarOptions: const ToolbarOptions(copy: true, paste: true, cut: true, selectAll: true),
+              ),
             ),
             const SizedBox(height: 35.0),
             InvoiceField(

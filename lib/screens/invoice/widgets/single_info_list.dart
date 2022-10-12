@@ -28,8 +28,6 @@ class SingleInfoListWidget extends StatelessWidget {
                   child: TextFormField(
                     decoration: const InputDecoration(
                       isDense: true,
-                      // hintText: "Description",
-                      // labelText: "Description",
                       alignLabelWithHint: true,
                       border: OutlineInputBorder(),
                       helperText: "Product name",
@@ -46,8 +44,6 @@ class SingleInfoListWidget extends StatelessWidget {
                   child: TextFormField(
                     decoration: const InputDecoration(
                       isDense: true,
-                      // hintText: "Unit Price",
-                      // labelText: "Unit Price",
                       alignLabelWithHint: true,
                       border: OutlineInputBorder(),
                       helperText: "Unit Price",
@@ -64,8 +60,6 @@ class SingleInfoListWidget extends StatelessWidget {
                   child: TextFormField(
                     decoration: const InputDecoration(
                       isDense: true,
-                      // hintText: "Quantity",
-                      // labelText: "Quantity",
                       alignLabelWithHint: true,
                       border: OutlineInputBorder(),
                       helperText: "Quantity",

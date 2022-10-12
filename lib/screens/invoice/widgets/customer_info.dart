@@ -18,6 +18,27 @@ class CustomerInfo extends StatelessWidget {
           children: [
             const PageTitleWidget(title: 'Enter details to generate new invoice'),
             const SizedBox(height: 30.0),
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: TextFormField(
+                onTap: () => invoiceController.showIOSDatePicker(true),
+                decoration: const InputDecoration(
+                  isDense: true,
+                  hintText: "Invoice date", 
+                  labelText: "Invoice date", 
+                  alignLabelWithHint: true,
+                  border: OutlineInputBorder(),
+                  helperText: "Enter invoice date",
+                  prefixIcon: Icon(Icons.date_range_rounded),
+                ),
+                keyboardType: TextInputType.datetime,
+                controller: invoiceController.invoiceDateCtrl,
+                style: TextStyle(color: Colors.grey[850]),
+                validator: (value) => value!.isEmpty ? "Enter invoice date" : null,
+                toolbarOptions: const ToolbarOptions(copy: true, paste: true, cut: true, selectAll: true),
+              ),
+            ),
+            const SizedBox(height: 30.0),
             InvoiceField(
               hintText: "Invoice number", 
               labelText: "Invoice number", 
