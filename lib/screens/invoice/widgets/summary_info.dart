@@ -135,7 +135,15 @@ class SummaryInfo extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: const Text("Payment Terms: ", style: TextStyle(color: Colors.black87)),
                 ),
-                Text(invoiceController.paymentTermsCtrl.text, style: const TextStyle(color: Colors.black87)),
+                Expanded(
+                  child: Text(
+                    invoiceController.paymentTermsCtrl.text, 
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(color: Colors.black87),
+                    overflow: TextOverflow.clip,
+                    softWrap: true,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 30.0),

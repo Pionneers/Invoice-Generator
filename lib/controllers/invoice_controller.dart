@@ -141,8 +141,8 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
       cusName: customerNameCtrl.text,
       cusAddress: customerAddCtrl.text,
       totalAmount: totalAmount.value,
-      pendingPayment: paymentTypeFull.value ? double.parse(balPaymentCtrl.text) : 0.00,
-      isPending: paymentTypeFull.value,
+      pendingPayment: paymentTypeFull.value ? 0.00 : double.parse(balPaymentCtrl.text),
+      isPending: !paymentTypeFull.value,
       dueDate: dueDateCtrl.text,
       paymentTerms: paymentTermsCtrl.text,
       products: products,
@@ -197,17 +197,19 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
       if(pdfFormKey.currentState!.validate()){
         for (int i = 0; i < controllers.length; i++) {
           if (controllers[i].isNotEmpty) {
-            if (!controllers[i][1].value.text.toString().contains('.')) {
+            if (!controllers[i][1].text.toString().contains('.')) {
               double unitPrice = int.parse(controllers[i][1].value.text).toDouble();
               int quantity = int.parse(controllers[i][2].value.text);
               totalAmount.value += (unitPrice * quantity);
               totalQuantity.value += quantity;
+              controllers[i][1].text = int.parse(controllers[i][1].value.text).toStringAsFixed(2);
             }
             else {
               double unitPrice = double.parse(controllers[i][1].value.text);
               int quantity = int.parse(controllers[i][2].value.text);
               totalAmount.value += (unitPrice * quantity);
               totalQuantity.value += quantity;
+              controllers[i][1].text = double.parse(controllers[i][1].value.text).toStringAsFixed(2);
             }
           }
         }
@@ -231,6 +233,15 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
     else if (isLastPage) {
       if (DateTime.tryParse(invoiceDateCtrl.text) == null) {
         controllers.toList().forEach((element) {
+          products.containsKey(element.toList()[0].text) ?
+          products.update(
+            element.toList()[0].text, 
+            (value) => {
+              "UnitPrice": double.parse(element.toList()[1].text), 
+              "Quantity": int.parse(element.toList()[2].text),
+            }
+          )
+          :
           products.putIfAbsent(
             element.toList()[0].text, 
             () => {
@@ -245,6 +256,15 @@ class InvoiceController extends GetxController with GetSingleTickerProviderState
         invoiceDateCtrl.text = DateFormat('dd-MM-yyyy').format(DateTime.parse(invoiceDateCtrl.text));
         dueDateCtrl.text = DateFormat('dd-MM-yyyy').format(DateTime.parse(dueDateCtrl.text));
         controllers.toList().forEach((element) {
+          products.containsKey(element.toList()[0].text) ?
+          products.update(
+            element.toList()[0].text, 
+            (value) => {
+              "UnitPrice": double.parse(element.toList()[1].text), 
+              "Quantity": int.parse(element.toList()[2].text),
+            }
+          )
+          :
           products.putIfAbsent(
             element.toList()[0].text, 
             () => {

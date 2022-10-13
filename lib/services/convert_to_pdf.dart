@@ -24,7 +24,6 @@ class PdfInvoiceApi {
   }) async {
     final pdf = Document();
     double paid = totalAmount - pendingPayment;
-    // double unitPrice = double.parse(log.get('totalAmount')) / log.get('totalProducts');
     ImageProvider image = MemoryImage((await rootBundle.load('assets/pictures/Pionneers_Logo.png')).buffer.asUint8List());
     
     pdf.addPage(MultiPage(
@@ -141,7 +140,7 @@ class PdfInvoiceApi {
 
     products.forEach((key, value) => list.add(Product(name: key, unitPrice: value['UnitPrice'], amount: value['Quantity'])));
     
-    final data = list.map((item) {
+    List<List<String?>> data = list.map((item) {
       double total = item.unitPrice! * item.amount!;
       return [
         item.name,
@@ -268,7 +267,10 @@ class PdfInvoiceApi {
       child: Row(
         children: [
           Expanded(child: Text(title, style: style)),
-          Text(value, style: unite ? style : null),
+          title == "Payment Terms:" ?
+          Expanded(child: Text(value, style: unite ? style : null, textAlign: TextAlign.right, overflow: TextOverflow.clip, softWrap: true,))
+          :
+          Text(value, style: unite ? style : null)
         ],
       ),
     );
