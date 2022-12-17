@@ -47,7 +47,17 @@ class SummaryInfo extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: const Text("Customer name: ", style: TextStyle(color: Colors.black87)),
                 ),
-                Text(invoiceController.customerNameCtrl.text, style: const TextStyle(color: Colors.black87)),
+                Expanded(
+                  child: Text(
+                    invoiceController.customerNameCtrl.text, 
+                    textAlign: TextAlign.right,
+                    softWrap: true,
+                    overflow: TextOverflow.clip,
+                    style: const TextStyle(
+                      color: Colors.black87
+                    )
+                  )
+                ),
               ],
             ),
             const SizedBox(height: 10.0),
@@ -63,7 +73,9 @@ class SummaryInfo extends StatelessWidget {
                   child: Text(
                     invoiceController.customerAddCtrl.text, 
                     textAlign: TextAlign.right,
-                    style: const TextStyle(color: Colors.black87), 
+                    style: const TextStyle(
+                      color: Colors.black87
+                    ), 
                     overflow: TextOverflow.clip,
                     softWrap: true,
                     maxLines: 5,
