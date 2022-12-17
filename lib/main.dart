@@ -3,6 +3,7 @@ import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get/instance_manager.dart';
 
 import '/screens/home/homepage.dart';
+import 'constants/theme.dart';
 import 'controllers/homepage_controller.dart';
 import 'controllers/invoice_controller.dart';
 
@@ -17,10 +18,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const GetMaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Invoice Generator',
-      home: Homepage(),
+      home: const Homepage(),
+      theme: CustomTheme().lightTheme(),
     );
   }
 }
