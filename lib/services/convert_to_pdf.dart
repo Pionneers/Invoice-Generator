@@ -165,6 +165,7 @@ class PdfInvoiceApi {
         3: Alignment.centerRight,
         4: Alignment.centerRight,
       },
+      cellFormat: (index, data) => "",
     );
   }
 
